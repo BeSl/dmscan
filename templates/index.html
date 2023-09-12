@@ -1,9 +1,15 @@
 <html>
   <head>
     <title>Video Streaming Demonstration</title>
+    <!-- <script>
+      setInterval(
+        ()=>location.reload(),41
+      )
+    </script> -->
   </head>
   <body>
     <h1>Камера</h1>
     <img src="{{ url_for('video_feed') }}">
+    <!-- <video src="{{ url_for('video_feed') }}" controls></video> -->
   </body>
 </html>
