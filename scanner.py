@@ -1,4 +1,5 @@
 
+import time
 import cv2
 from fastapi import FastAPI
 from fastapi.responses import StreamingResponse
@@ -9,7 +10,12 @@ import parametrs as params
 import keyboard
 
 accuracy = 70 
-version = "v0.1alfa vbelyakov"
+pausedFrame = 60
+curPause = 0
+version = "v0.1 vbelyakov(c)"
+textColorVersion = (0,0,255)
+textColorInfo = (255,0,0)
+
 class StatusScanner(object):
     Scan = "Search DM Code"
     Stopped = "Stop scan"
@@ -17,24 +23,25 @@ class StatusScanner(object):
 
 
 def renderPlain(image, statusScan):
+    height, width = image.shape[:2]
 
     image = cv2.putText(
         image,
         statusScan,
-        (30, 30),
+        (width-150, height-35) ,
         cv2.FONT_HERSHEY_COMPLEX,
-        0.5,
-        (255, 55, 108),
-        1
+        0.6,
+        textColorInfo,
+        2
     )
 
     image = cv2.putText(
         image,
         version,
-        (520, 30),
-        cv2.FONT_HERSHEY_COMPLEX,
+        (width-150, height-10),
+        cv2.FONT_HERSHEY_DUPLEX,
         0.5,
-        (255, 55, 108),
+        textColorVersion,
         1
     )    
 
@@ -109,8 +116,10 @@ class VideoCamera(object):
                 self.LastUIN = UIN        
             if self.LastUIN != None and len(self.LastUIN) > 5:
                 keyboard.write(self.LastUIN)
+                time.sleep(0.2)
                 keyboard.write("\n")               
-                self.LastUIN = None
+                # self.LastUIN = None
+                self.scanStatus = StatusScanner.Waiting
             render(not found, image, points, UIN, self.scanStatus)
         else:
             render(True, image, None, None, self.scanStatus)

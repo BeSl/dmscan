@@ -12,7 +12,7 @@ app = FastAPI()
 img_params = parametrs.ImgParametrs()
 
 # default
-img_params.set_params( 360, 640, 1)
+img_params.set_params( 360, 640, 0)
 CurVideo = scanner.VideoCamera(img_params)
 
 # последний распознанный уин
@@ -40,7 +40,13 @@ def newScan():
 def stopscan():
     CurVideo.LastUIN = None
     CurVideo.scanStatus = scanner.StatusScanner.Stopped
-    # CurVideo.destoyWindow()
+    return {"succes": "true"}
+
+@app.get('/pausescan/{uin}')
+def stopscan(uin: str):
+    if uin == CurVideo.LastUIN:
+        CurVideo.LastUIN = None
+        CurVideo.scanStatus = scanner.StatusScanner.Stopped
     return {"succes": "true"}
 
 @app.post('/setinput')
@@ -57,8 +63,6 @@ def gen(camera, openFrame = True ):
 @app.get('/video_feed')
 def video_feed():
     return StreamingResponse(gen(CurVideo), media_type="multipart/x-mixed-replace;boundary=frame")
-    # return StreamingResponse(gen(CurVideo), media_type="image/jpg")
-
 
 if __name__ == '__main__':
     uvicorn.run("main:app", host="0.0.0.0", port=5000, access_log=False)
